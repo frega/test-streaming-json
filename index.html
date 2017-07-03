@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+  <script src="./oboe-browser.js"></script>
+  <script type="text/javascript">
+    var start = window.performance.now();
+    window.performance.mark('start');
+    console.log('Starting at %s', start);
+    var count = 0;
+    oboe('./jsonapi.php')
+      .node('data', function(d) {
+        window.performance.mark('critical_loaded');
+        console.log('%s data', window.performance.now() - start, d);
+      })
+      .node('embedded.*', function(d) {
+        count++;
+        window.performance.mark('embedded_loaded');
+        console.log('%s #%d embedded.*', window.performance.now() - start, count, d);
+      })
+      .done(function(things) {
+        window.performance.mark('all_loaded');
+        console.log('%s All the things', window.performance.now() - start, things);
+        /* window.performance.measure('measure_critical_loaded', 'start', 'critical_loaded');
+        window.performance.measure('measure_all_loaded', 'start', 'all_loaded'); */
+      })
+      .fail(function(e) {
+        console.log('Error', e);
+      });
+  </script>
+  <body>
+    look in the console.
+  </body>
+</html>
